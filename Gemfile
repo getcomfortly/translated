@@ -8,6 +8,8 @@ gemspec
 
 gem 'puma'
 gem 'rubocop'
+gem 'rubocop-performance'
+gem 'rubocop-rails'
 gem 'sqlite3'
 
 # Start debugger with binding.b [https://github.com/ruby/debug]

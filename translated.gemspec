@@ -6,10 +6,10 @@ Gem::Specification.new do |spec|
   spec.name        = 'translated'
   spec.version     = Translated::VERSION
   spec.authors     = ['Trae Robrock', 'Andrew Katz']
-  spec.email       = ['trobrock@hey.com', 'andrew.katz@hey.com']
+  spec.email       = ['trobrock@comfort.ly', 'andrew@comfort.ly']
   spec.homepage    = 'https://github.com/getcomfortly/translated'
-  spec.summary     = 'Automatically translate your Active Record models.'
-  spec.description = 'Automatically translate your Active Record models.'
+  spec.summary     = 'Simple, automatic translations for your Rails app.'
+  spec.description = 'Simple, automatic translations for your Rails app.'
   spec.license     = 'MIT'
 
   spec.required_ruby_version = '>= 3.0.0'
@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   # to allow pushing to a single host or delete this section to allow pushing to any host.
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
 
-  spec.metadata['homepage_uri'] = spec.homepage
+  spec.metadata['homepage_uri'] = 'https://translatedrb.com'
   spec.metadata['source_code_uri'] = 'https://github.com/getcomfortly/translated'
 
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activejob', rails_version
   spec.add_dependency 'activerecord', rails_version
   spec.add_dependency 'railties', rails_version
+  spec.add_dependency 'activesupport', rails_version
   spec.add_dependency 'rest-client', '>= 2.1.0'
 
   spec.metadata['rubygems_mfa_required'] = 'true'

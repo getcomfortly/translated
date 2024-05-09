@@ -42,6 +42,52 @@ module Translated
 
         scope :with_translations, -> { includes(:translated_text_fields) }
       end
+
+      def has_translated_rich_text(name) # rubocop:disable Naming/PredicateName
+        class_eval <<-CODE, __FILE__, __LINE__ + 1 # rubocop:disable Style/DocumentDynamicEvalDefinition
+          def #{name}
+            public_send(:"#{name}_\#{I18n.locale}")
+          end
+
+          def #{name}?
+            #{name}.present?
+          end
+
+          def #{name}=(body)
+            self.public_send(:"#{name}_\#{I18n.locale}=", body)
+
+            I18n.available_locales.each do |locale|
+              next if locale == I18n.locale
+
+              generate_translation_for_#{name}(I18n.locale, locale)
+            end
+
+            body
+          end
+
+          private
+
+          def generate_translation_for_#{name}(from, to)
+            self.public_send(:"#{name}_\#{to}=", Translator.new.translate(public_send(:"#{name}_\#{from}").body.to_html, from:, to:))
+          end
+        CODE
+
+        I18n.available_locales.each do |locale|
+          has_rich_text :"#{name}_#{locale}"
+        end
+
+        scope :"with_rich_text_#{name}", lambda {
+                                           includes(I18n.available_locales.map do |locale|
+                                                      :"rich_text_#{name}_#{locale}"
+                                                    end)
+                                         }
+        scope :"with_rich_text_#{name}_and_embeds", lambda {
+                                                      includes(I18n.available_locales.to_h do |locale|
+                                                                 [:"rich_text_#{name}_#{locale}",
+                                                                  { embeds_attachments: :blob }]
+                                                               end)
+                                                    }
+      end
     end
   end
 end
