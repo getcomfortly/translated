@@ -25,7 +25,7 @@ module Translated
       self.content ||= {}
       self.content[locale] = value
 
-      @_needs_translations = true
+      @_needs_translations = content_changed?
       value
     end
 
@@ -44,7 +44,7 @@ module Translated
     private
 
     def needs_translations?
-      defined?(:@_needs_translations) && @_needs_translations
+      defined?(:@_needs_translations) && @_needs_translations && Translated.environments.include?(Rails.env)
     end
 
     def update_translations_later

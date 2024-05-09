@@ -7,27 +7,27 @@ module Translated
     class_methods do
       def has_translated_text_field(name, validates: {}) # rubocop:disable Naming/PredicateName
         class_eval <<-CODE, __FILE__, __LINE__ + 1 # rubocop:disable Style/DocumentDynamicEvalDefinition
-        def #{name}
-          translation = #{name}_translation || build_#{name}_translation
-          translation&.for_locale(I18n.locale)
-        end
+          def #{name}
+            translation = #{name}_translation || build_#{name}_translation
+            translation&.for_locale(I18n.locale)
+          end
 
-        def #{name}?
-          #{name}.present?
-        end
+          def #{name}?
+            #{name}.present?
+          end
 
-        def #{name}=(content)
-          translation = self.#{name}_translation || build_#{name}_translation
-          translation.set_locale(I18n.locale, content)
-          @_#{name}_translation_changed = true
-          content
-        end
+          def #{name}=(content)
+            translation = self.#{name}_translation || build_#{name}_translation
+            translation.set_locale(I18n.locale, content)
+            @_#{name}_translation_changed = true
+            content
+          end
 
-        private
+          private
 
-        def #{name}_translation_changed?
-          defined?(:@_#{name}_translation_changed) && @_#{name}_translation_changed
-        end
+          def #{name}_translation_changed?
+            defined?(:@_#{name}_translation_changed) && @_#{name}_translation_changed
+          end
         CODE
 
         has_one :"#{name}_translation",
@@ -55,26 +55,40 @@ module Translated
 
           def #{name}=(body)
             self.public_send(:"#{name}_\#{I18n.locale}=", body)
+            @_needs_rich_translation ||= []
 
             I18n.available_locales.each do |locale|
               next if locale == I18n.locale
 
-              generate_translation_for_#{name}(I18n.locale, locale)
+              @_needs_rich_translation << [:#{name}, I18n.locale, locale]
             end
 
             body
           end
 
-          private
-
           def generate_translation_for_#{name}(from, to)
             self.public_send(:"#{name}_\#{to}=", Translator.new.translate(public_send(:"#{name}_\#{from}").body.to_html, from:, to:))
+            save!
+          end
+
+          private
+
+          def needs_rich_translations?
+            defined?(:@_needs_rich_translation) && @_needs_rich_translation.present?
+          end
+
+          def update_rich_translations_later
+            @_needs_rich_translation.each do |args|
+              UpdateRichTranslationsJob.perform_later(self, *args)
+            end
           end
         CODE
 
         I18n.available_locales.each do |locale|
           has_rich_text :"#{name}_#{locale}"
         end
+
+        after_commit :update_rich_translations_later, if: :needs_rich_translations?
 
         scope :"with_rich_text_#{name}", lambda {
                                            includes(I18n.available_locales.map do |locale|
