@@ -48,7 +48,10 @@ Get your API key from https://translatedrb.com
 Create an initializer `config/initializers/translated.rb`
 ```ruby
 Translated.api_key = 'API KEY from translatedrb.com'
-Translated.environments = %w(production)
+
+# Optionally, you can configure which environments you would like translated.
+# By default, it will translate development and production
+# Translated.environments = %w(development production)
 ```
 
 ## License
