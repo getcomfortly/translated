@@ -35,19 +35,20 @@ gem "translated"
 
 And then execute:
 ```bash
-$ bundle
+bundle
 ```
 
 Install the migrations:
 ```bash
-$ bin/rails translated:install:migrations
+bin/rails translated:install:migrations
 ```
 
 Get your API key from https://translatedrb.com
+
 Create an initializer `config/initializers/translated.rb`
 ```ruby
 Translated.api_key = 'API KEY from translatedrb.com'
-Translated.environments = %w(production)
+Translated.environments = %w(development production)
 ```
 
 ## License
