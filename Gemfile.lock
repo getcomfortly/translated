@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    translated (0.3.0)
+    translated (0.4.0)
       activejob (>= 7.1)
       activerecord (>= 7.1)
       activesupport (>= 7.1)

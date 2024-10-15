@@ -23,6 +23,10 @@ module Translated
             content
           end
 
+          def #{name}_changed?
+            #{name}_translation_changed? || super
+          end
+
           private
 
           def #{name}_translation_changed?
@@ -40,7 +44,15 @@ module Translated
 
         validates name, validates if validates.present?
 
-        scope :with_translations, -> { includes(:translated_text_fields) }
+        scope :"with_#{name}_translation", -> { includes(:"#{name}_translation") }
+      end
+
+      def with_translations
+        includes(translation_association_names)
+      end
+
+      def translation_association_names
+        reflect_on_all_associations(:has_one).map(&:name).select { |n| n.ends_with?('_translation') }
       end
 
       def has_translated_rich_text(name) # rubocop:disable Naming/PredicateName
