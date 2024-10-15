@@ -5,7 +5,7 @@ module Translated
     queue_as :default
 
     def perform(record, attribute_name)
-      record.public_send(:"generate_translation_for_#{attribute_name}")
+      record.public_send(:"generate_translations_for_#{attribute_name}")
     end
   end
 end

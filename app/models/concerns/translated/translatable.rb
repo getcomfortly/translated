@@ -59,12 +59,6 @@ module Translated
             body
           end
 
-          private
-
-          def #{name}_translation_changed?
-            defined?(:@_#{name}_translation_changed) && @_#{name}_translation_changed
-          end
-
           def generate_translations_for_#{name}
             I18n.available_locales.each do |locale|
               next if locale == I18n.locale
@@ -75,6 +69,12 @@ module Translated
               translation = content.present? ? Translator.new.translate(content, from:, to:) : nil
               update("#{name}_\#{to}" => translation)
             end
+          end
+
+          private
+
+          def #{name}_translation_changed?
+            defined?(:@_#{name}_translation_changed) && @_#{name}_translation_changed
           end
 
           def generate_translations_for_#{name}_later
