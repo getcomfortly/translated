@@ -54,5 +54,9 @@ Translated.api_key = 'API KEY from translatedrb.com'
 # Translated.environments = %w(development production)
 ```
 
+## Example Project
+
+Check out an example Rails project with Translated already installed [here](https://github.com/getcomfortly/translated-example).
+
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
