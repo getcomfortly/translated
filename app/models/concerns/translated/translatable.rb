@@ -55,32 +55,30 @@ module Translated
 
           def #{name}=(body)
             self.public_send(:"#{name}_\#{I18n.locale}=", body)
-            @_needs_rich_translation ||= []
-
-            I18n.available_locales.each do |locale|
-              next if locale == I18n.locale
-
-              @_needs_rich_translation << [:#{name}, I18n.locale, locale]
-            end
-
+            @_#{name}_translation_changed = true
             body
-          end
-
-          def generate_translation_for_#{name}(from, to)
-            self.public_send(:"#{name}_\#{to}=", Translator.new.translate(public_send(:"#{name}_\#{from}").body.to_html, from:, to:))
-            save!
           end
 
           private
 
-          def needs_rich_translations?
-            defined?(:@_needs_rich_translation) && @_needs_rich_translation.present?
+          def #{name}_translation_changed?
+            defined?(:@_#{name}_translation_changed) && @_#{name}_translation_changed
           end
 
-          def update_rich_translations_later
-            @_needs_rich_translation.each do |args|
-              UpdateRichTranslationsJob.perform_later(self, *args)
+          def generate_translations_for_#{name}
+            I18n.available_locales.each do |locale|
+              next if locale == I18n.locale
+
+              from = I18n.locale
+              to = locale
+              content = public_send(:"#{name}_\#{from}").body&.to_html
+              translation = content.present? ? Translator.new.translate(content, from:, to:) : nil
+              update("#{name}_\#{to}" => translation)
             end
+          end
+
+          def generate_translations_for_#{name}_later
+            UpdateRichTranslationsJob.perform_later(self, :#{name})
           end
         CODE
 
@@ -88,7 +86,7 @@ module Translated
           has_rich_text :"#{name}_#{locale}"
         end
 
-        after_commit :update_rich_translations_later, if: :needs_rich_translations?
+        after_save :"generate_translations_for_#{name}_later", if: :"#{name}_translation_changed?"
 
         scope :"with_rich_text_#{name}", lambda {
                                            includes(I18n.available_locales.map do |locale|
