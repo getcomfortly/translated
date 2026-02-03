@@ -8,6 +8,10 @@ module Translated
 
     validates :language, presence: true, inclusion: { in: I18n.available_locales.map(&:to_s) }
 
+    scope :with_missing_translations, -> {
+      where.not(id: where("json_array_length(content) >= ?", I18n.available_locales.size))
+    }
+
     after_commit :update_translations_later, if: :needs_translations?
 
     after_initialize do
@@ -15,7 +19,11 @@ module Translated
     end
 
     def for_locale(locale)
-      content.fetch(locale.to_s, nil)
+      content.fetch(locale.to_s) { content[language] }
+    end
+
+    def missing_translations?
+      (I18n.available_locales.map(&:to_s) - content.keys).any?
     end
 
     def set_locale(locale, value)

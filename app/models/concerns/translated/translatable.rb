@@ -42,7 +42,7 @@ module Translated
                 inverse_of: :translatable
         after_save -> { public_send(:"#{name}_translation").save }, if: :"#{name}_translation_changed?"
 
-        validates name, validates if validates.present?
+        validates name, validates.merge(if: :"#{name}_translation_changed?") if validates.present?
 
         scope :"with_#{name}_translation", -> { includes(:"#{name}_translation") }
       end
