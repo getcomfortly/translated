@@ -18,20 +18,12 @@ module Translated
       self.content ||= {}
     end
 
-    # Sync translations for a single record by ID.
-    # Designed for use with delayable pattern: TranslatedTextField.delay.sync_record(id)
-    def self.sync_record(id)
-      find(id).update_translations
-    end
-
     # Sync only records that are missing translations.
-    # Designed for use with delayable pattern: TranslatedTextField.delay.sync_missing
     def self.sync_missing
       with_missing_translations.find_each(&:update_translations)
     end
 
     # Re-translate all records. Useful after adding a new locale.
-    # Designed for use with delayable pattern: TranslatedTextField.delay.sync_all
     def self.sync_all
       find_each(&:update_translations)
     end
