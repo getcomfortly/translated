@@ -8,8 +8,19 @@ module Translated
 
     validates :language, presence: true, inclusion: { in: I18n.available_locales.map(&:to_s) }
 
-    scope :with_missing_translations, -> {
-      where.not(id: where("json_array_length(content) >= ?", I18n.available_locales.size))
+    scope :with_missing_translations, lambda {
+      json_length_expression = case connection.adapter_name
+                               when /mysql/i
+                                 'JSON_LENGTH(content)'
+                               when /sqlite/i
+                                 "(SELECT count(*) FROM json_each(#{table_name}.content))"
+                               when /postgres/i
+                                 '(SELECT count(*) FROM jsonb_each_text(content::jsonb))'
+                               else
+                                 'JSON_LENGTH(content)'
+                               end
+
+      where.not(id: where("#{json_length_expression} >= ?", I18n.available_locales.size))
     }
 
     after_commit :update_translations_later, if: :needs_translations?

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# This migration comes from translated (originally 202405031152)
 class CreateTranslatedTranslatedTextFields < ActiveRecord::Migration[7.1]
   def change
     create_table :translated_translated_text_fields do |t|

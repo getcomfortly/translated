@@ -10,7 +10,7 @@ gem 'puma'
 gem 'rubocop'
 gem 'rubocop-performance'
 gem 'rubocop-rails'
-gem 'sqlite3'
+gem 'sqlite3', '~> 1.4'
 
 # Start debugger with binding.b [https://github.com/ruby/debug]
 # gem "debug", ">= 1.0.0"
