@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_08_192625) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_20_000000) do
   create_table "articles", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at", null: false
@@ -22,7 +22,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_08_192625) do
     t.integer "translatable_id", null: false
     t.string "field"
     t.string "language"
-    t.text "content"
+    t.json "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["translatable_type", "translatable_id"], name: "index_translated_translated_text_fields_on_translatable"

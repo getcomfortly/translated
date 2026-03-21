@@ -19,7 +19,7 @@ module Translated
           content_type: :json
         )
         JSON.parse(response.body)['translated_text']
-      rescue RestClient::GatewayTimeout => e
+      rescue RestClient::GatewayTimeout, RestClient::BadGateway => e
         retries += 1
         if retries <= MAX_RETRIES
           sleep(RETRY_DELAY * retries) # exponential backoff
